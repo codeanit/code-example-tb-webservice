@@ -19,7 +19,7 @@ class TransactionModelTest  extends \PHPUnit_Framework_TestCase
   /**
    * [Test Case for PAID status in GetRemittance Method]
    */
-  public function  testGetRemittancePaid() 
+  public function  ptestGetRemittancePaid() 
   {
     
     $postParam = array(
@@ -46,7 +46,7 @@ class TransactionModelTest  extends \PHPUnit_Framework_TestCase
   /**
    * [Test Case for Approved status in GetRemittance Method]
    */
-  public function testGetRemittanceApproved()
+  public function ptestGetRemittanceApproved()
   {
     $postParam = array(
             'model' => 'MLhuillier',
@@ -69,7 +69,7 @@ class TransactionModelTest  extends \PHPUnit_Framework_TestCase
   /**
    * [Test Case for Other status like (cancelled deleted void hold) in GetRemittance Method]
    */
-  public function testGetRemittanceOther()
+  public function ptestGetRemittanceOther()
   {
     $postParam = array(
             'model' => 'MLhuillier',
@@ -103,7 +103,7 @@ class TransactionModelTest  extends \PHPUnit_Framework_TestCase
     $this->model = new MLhuillier($postParam);
     $expected='2|2';
 
-    $this->model->inquireTagAsCompleted();
+    $this->model->tagAsCompleted();
     $result = $this->model->getReturn();
         
     $this->assertEquals($expected,$result);
@@ -130,7 +130,7 @@ class TransactionModelTest  extends \PHPUnit_Framework_TestCase
     $expected = '';
    
     
-   $this->model->inquireTagAsCompleted();
+   $this->model->tagAsCompleted();
     $result = $this->model->getReturn();  
     $this->assertEquals($expected,$result);
   }
@@ -154,7 +154,7 @@ class TransactionModelTest  extends \PHPUnit_Framework_TestCase
 
     $expected ='2|3';    
     
-    $this->model->inquireTagAsCompleted();
+    $this->model->tagAsCompleted();
     $result = $this->model->getReturn(); 
     
     $this->assertEquals($expected,$result);
@@ -176,13 +176,13 @@ class TransactionModelTest  extends \PHPUnit_Framework_TestCase
 
     $expected = '2|3';
 
-    $this->model->tagAsCompleted();
+    $this->model->inquireTagAsCompleted();
     $result = $this->model->getReturn(); 
        
     $this->assertEquals($expected,$result);
   }
 
-  public function testCheckStatusPaid()
+  public function ptestCheckStatusPaid()
   {
     $postParam = array(
             'model' => 'MLhuillier',
@@ -198,7 +198,7 @@ class TransactionModelTest  extends \PHPUnit_Framework_TestCase
 
     $expected = '2|0|123|502000098|200.00|US Dollar|Bhjkgfj|Teest||Ertertwe|zero';
     
-    $this->model->tagAsCompleted();
+    $this->model->inquireTagAsCompleted();
     $result = $this->model->getReturn();     
     $this->assertEquals($expected,$result);
   }

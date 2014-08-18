@@ -27,7 +27,7 @@ use Model\WebServiceModel as WebService;
  * @link     (remittanceController, http://firsglobaldata.com)
  */
 
-class MLhuillierModel extends WebService
+class GCashModel extends WebService
 {
 
     private $_transactionObj;
@@ -57,13 +57,13 @@ class MLhuillierModel extends WebService
         if ($this->_check==true) {
 
             if ($this->return['status'] == 'approved') {
-                    $this->formatReturnData('get');  
+                    $this->formatReturnData('showApproved');  
 
             } elseif ($this->return['status'] == 'paid') {
-                    $this->return = $this->parameters['sessionID'].'|1';      
+                    $this->formatReturnData('showPaid');
 
             } else {
-                    $this->return = $this->parameters['sessionID'] .'|3';           
+                    $this->return = '3';           
             }
         }
 
@@ -84,10 +84,10 @@ class MLhuillierModel extends WebService
 
 
             } elseif ($this->return['status'] == 'paid') {
-                    $this->return = $this->parameters['sessionID'].'|2';            
+                    $this->return = '2';            
 
             } else {
-                    $this->return = $this->parameters['sessionID'].'|3';   
+                    $this->return = '3';   
                             
             }
         }
@@ -102,9 +102,9 @@ class MLhuillierModel extends WebService
         if ($this->_check==true) {
 
             if ($this->return['status'] == 'paid') {
-                    $this->formatReturnData('check');
+                    $this->formatReturnData('update');
             } else {
-                    $this->return = $this->parameters['sessionID'].'|1';              
+                    $this->return = '1';              
             }
         }
     }
@@ -118,10 +118,10 @@ class MLhuillierModel extends WebService
      */
     public function checkRefNoTransactionExists($refNo)
     {
-        $this->return = $this->_transactionObj->connection->fetchAssoc('SELECT c.name,f.status,f.control_number,f.remitting_amount,fc.firstName,fc.lastName,fc.middleName,fc.mobile,fc.street FROM f1_transactions f JOIN f1_customer fc ON fc.id=f.beneficiary_id JOIN f1_currencies c ON c.id=f.receiving_currency_id WHERE f.control_number = ?', array($refNo));
+        $this->return = $this->_transactionObj->connection->fetchAssoc('SELECT f.status,f.control_number,f.remitting_amount,fc.firstName,fc.lastName,fc.middleName,fc.phone,fc.street FROM f1_transactions f JOIN f1_customer fc ON fc.id=f.beneficiary_id  WHERE f.control_number = ?', array($refNo));
         $state=count($this->return);
         if ($state<2) {
-                $this->return = $this->parameters['sessionID'].'|4';
+                $this->return = '4';
         }
         return ($state<2)?false:true;
     }
@@ -133,11 +133,11 @@ class MLhuillierModel extends WebService
      */
     public function getUnAuthorizedData()
     {
-          $this->return  = $this->parameters['sessionID'] .'|5';
+          $this->return  ='5';
     }
 
     /**
-     * sets return variable to Mulhiller formated string according to $type
+     * sets return variable to GCASH formated string according to $type
      *
      * @param string $type update/get/check
      * 
@@ -145,17 +145,17 @@ class MLhuillierModel extends WebService
      */
     public function formatReturnData($type)
     {
+        if ($type=='showApproved') {
+                $this->return=$this->return['control_number'].'|0|'.$this->return['remitting_amount'].'|'.$this->return['lastName'].'|'.$this->return['firstName'].'|'.
+                $this->return['middleName'].'|null|null|null|'.$this->return['street'].'|'.$this->return['phone']; 
+        }
+        if ($type=='showPaid') {
+                $this->return=$this->return['control_number'].'|1|'.$this->return['remitting_amount'].'|'.$this->return['lastName'].'|'.$this->return['firstName'].'|'.
+                $this->return['middleName'].'|null|null|null|'.$this->return['street'].'|'.$this->return['phone']; 
+        }
         if ($type=='update') {
-                $this->return=$this->parameters['sessionID'].'|0|'.$this->parameters['traceNo'].'|'.$this->return['control_number'].'|'.$this->return['remitting_amount'].'|'.$this->return['name'].'|'.$this->return['lastName'].'|'.$this->return['firstName'].'|'.
-                $this->return['middleName'].'|'.$this->return['street'].'|zero'; 
-        }
-        if ($type=='get') {
-                $this->return= $this->parameters['sessionID'].'|0|'.$this->return['control_number'].'|'.$this->return['remitting_amount'].'|'.$this->return['name'].'|'.$this->return['lastName'].'|'.$this->return['firstName'].'|'.
-                $this->return['middleName'].'|'.$this->return['street'].'|'.$this->return['mobile'];
-        }
-        if ($type=='check') {
-                $this->return=$this->parameters['sessionID'].'|0|'.$this->parameters['traceNo'].'|'.$this->return['control_number'].'|'.$this->return['remitting_amount'].'|'.$this->return['name'].'|'.$this->return['lastName'].'|'.$this->return['firstName'].'|'.
-                $this->return['middleName'].'|'.$this->return['street'].'|zero';
+                $this->return=$this->parameters['traceNo'].'|'.$this->return['control_number'].'|0|'.$this->return['remitting_amount'].'|'.$this->return['lastName'].'|'.
+                $this->return['firstName'].'|'.$this->return['middleName'].'|null|null|null|'.$this->return['street'].'|'.$this->return['phone']; 
         }
          
     }
