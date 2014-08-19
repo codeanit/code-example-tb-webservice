@@ -15,6 +15,7 @@ require_once 'autoload.php';
 
 use  Model\ModelFactory as Factory;
 use  Model\MLhuillierModel as MLhuillier;
+use  Model\GCashModel as GCash;
 
 
 // define('BASEPATH', 'DEXInterface');
@@ -45,7 +46,11 @@ final class DEXInterface
         if ($postParam['model'] == "MLhuillier") {
             $factory = new Factory(new MLhuillier($_POST));
             $this->_return = $factory->returnData();
-        }              
+        }
+        if ($postParam['model'] == "GCash") {
+            $factory = new Factory(new GCash($_POST));
+            $this->_return = $factory->returnData();
+        }                
     }
 
     /**
@@ -81,9 +86,8 @@ final class DEXInterface
 
 $return = "500 Error! Please try again!";
 
-if ($_SERVER['REQUEST_METHOD'] == "POST" && DEXInterface::_checkRemoteAddress() == true  && $_POST['model'] != ' ')
-{
-    $indexObj = new DEXInterface($_POST );    
+if ($_SERVER['REQUEST_METHOD'] == "POST" && DEXInterface::_checkRemoteAddress() == true  && $_POST['model'] != ' ') {
+    $indexObj = new DEXInterface($_POST ); 
     $return = $indexObj->getReturn();
 }
 else {
