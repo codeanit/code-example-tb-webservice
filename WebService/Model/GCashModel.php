@@ -15,6 +15,7 @@ namespace Model;
 
 use Model\TransactionModel as Transaction;
 use Model\WebServiceModel as WebService;
+use Model\UserModel as User;
 
 /**
  * Bridge to call TB DBAL
@@ -133,8 +134,15 @@ class GCashModel extends WebService
      */
     public function getUnAuthorizedData()
     {
-          $this->return  ='5';
+        if ($this->parameters['operation']=='changePassword') {
+            $this->return  ='1';
+        } else {
+            $this->return ='5';
+        }
     }
+
+    
+
 
     /**
      * sets return variable to GCASH formated string according to $type
@@ -159,6 +167,28 @@ class GCashModel extends WebService
         }
          
     }
+
+    /**
+     * [changePassword description]
+     * 
+     * @return [type] [description]
+     */
+    public  function changePassword() 
+    {
+        if ($this->parameters['newPassword'] !=' ') {
+            $user = new User();
+            $status=$user->changePassword($this->parameters['username'], $this->parameters['newPassword']); 
+            if ($status == true) {
+                $this ->return ='0';
+            } else {
+                $this->return = 'error in changing password';
+            }         
+
+        }
+
+    }
+
+
 
     /**
      * set return data 

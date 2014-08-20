@@ -42,21 +42,25 @@ class ModelFactory
      * @param Main $obj Object of Main class sub-calsses
      */
     public function __construct(WebService $obj)
-    { 
-        
+    {
         $user = new User();        
         if ($user->authenticateUser($obj->parameters['username'], $obj->parameters['password'])) {
             $obj->execute();
             $this->_returnData = $obj->getReturn();
-        } else {
-            $obj->getUnAuthorizedData();
+        } else {           
+            $obj->getUnAuthorizedData();           
             $this->_returnData = $obj->getReturn();
-
         }
         
     }
 
-    public function returnData() {
-       return $this->_returnData; 
+    /**
+     * Returns set data for testing in String format 
+     * 
+     * @return void
+     */
+    public function returnData() 
+    {
+        return $this->_returnData; 
     }
 }

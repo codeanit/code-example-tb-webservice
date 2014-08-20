@@ -15,7 +15,21 @@ class TransactionModelTest  extends \PHPUnit_Framework_TestCase
   {
 		
   }
-  	
+  
+  /**
+     * [testChangePassword description]
+     * 
+     * @return [type] [description]
+     */
+    public function testChangePassword()
+    {
+        $postParam = array('sessionID' => '2','refNo' => '','username'=>'AWARFA','newPassword'=>'123456');        
+        $this->_model = new MLhuillier($postParam);
+        $this->_model->changePassword();
+        $result = $this->_model->getReturn();
+        $this->assertEquals('21|0', $result);
+    }   
+
   /**
    * [Test Case for PAID status in GetRemittance Method]
    */
@@ -174,7 +188,7 @@ class TransactionModelTest  extends \PHPUnit_Framework_TestCase
     
     $this->model = new MLhuillier($postParam);
 
-    $expected = '2|3';
+    $expected = '2|1';
 
     $this->model->inquireTagAsCompleted();
     $result = $this->model->getReturn(); 

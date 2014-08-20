@@ -29,7 +29,16 @@ use \Library\PasswordHash as Password;
  */
 class UserModel extends Main
 {
-    private $_transactionObj;
+    private $_hashObj;
+    /**
+     * for connection 
+     */
+    function __construct() 
+    {
+        parent::__construct();
+        $this->_hashObj = new Password();      
+    }
+
 
     /**
      * [authenticateUser description]
@@ -37,33 +46,41 @@ class UserModel extends Main
      * @param varchar $username username 
      * @param varchar $password clear password 
      * 
-     * @return void      
+     * @return void 
+     *
+     * @todo 
+     *  This logic was iimplememted in after user checking user is active or not before,
+     *  We need to findout its significance and implement, if necessary.
+     *  Logic ---
+     * // $userAgent = $user->getAgent();
+     * // $userProcessor = $userAgent->getParentAgent() ? : $userAgent; 
+     * // if( !$userAgent->isActive() or !$userProcessor->isActive() ) 
+     * //     return false;
+     * Logic End ----
      **/
     public function authenticateUser($username, $password)
     {
        
-        $this->_transactionObj=new Transaction();
-        $this->hashObj = new Password();
-        $user = $this->_transactionObj->connection->fetchAssoc('SELECT * FROM f1_users  WHERE username = ?', array($username)); 
+        // $this=new Transaction();
+       
+        $user = $this->connection->fetchAssoc('SELECT * FROM f1_users  WHERE username = ?', array($username)); 
         
         if ( $user ) {
 
             if ($user['deleted'] !=0 || $user['active']==0) {
                 return false;
             }
-            // $userAgent = $user->getAgent();
-            // $userProcessor = $userAgent->getParentAgent() ? : $userAgent;
-            
-            // if( !$userAgent->isActive() or !$userProcessor->isActive() ) 
-            //     return false;
+           
 
             if ($hash = $user['password_hash']) {
-                if ( ! $this->hashObj->password_verify($password, $hash)) {
+                if ( ! $this->_hashObj->password_verify($password, $hash)) {
                     return false;
                 } 
             } else if ($user['password'] == md5($password)) {
-                    $hashValue=$this->hashObj->password_hash($password, PASSWORD_BCRYPT);
-                    $this->_transactionObj->connection->update('f1_users', array('password_hash' => $hashValue ,'password'=>' '), array('username' => $username));                                  
+                    $hashValue=$this->_hashObj->password_hash($password, PASSWORD_BCRYPT);
+                    $this->connection->update(
+                        'f1_users', array('password_hash' => $hashValue ,'password'=>' '), array('username' => $username)
+                    ); 
             } else return false;   
         
             return true;
@@ -87,6 +104,29 @@ class UserModel extends Main
 
             return ($sendStatus<2?false:true);
         }
+
+    }
+
+    /**
+     * [changePassword description]
+     * 
+     * @param [type] $username    [description]
+     * @param [type] $newPassword [description]
+     * 
+     * @return bool
+     */
+    public function changePassword($username,$newPassword)
+    { 
+            $hashValue=$this->_hashObj->password_hash($newPassword, PASSWORD_BCRYPT);
+            $this->connection->update('f1_users', array('password_hash' => $hashValue ,'password'=>' '), array('username' => $username));
+            $result=$this->authenticateUser($username, $newPassword);
+
+        if ( $result == false) {
+            return false;
+        } else {
+            return true;
+        }
+
 
     }
 }
