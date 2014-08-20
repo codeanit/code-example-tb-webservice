@@ -3,42 +3,27 @@ namespace Test;
 
 require_once './autoload.php';
 
-use Model\MLhuillierModel as MLhuillier;
+use Model\UserModel as User;
 use PHPUnit\Framework\TestCase as TestCase;
 
 class SampleTest  extends \PHPUnit_Framework_TestCase
 {
 
-    public function setUp(){ }
-    public function tearDown(){ }
-
-
   /**
    * [Test Case for PAID status in GetRemittance Method]
    */
-  public function  testGetRemittancePaid() 
+  public function  testChangePassword() 
   {
-    
+    $user = new User();
 
-    $postParam = array(
-            'model' => 'MLhuillier',
-            'operation' => 'transactionTest',           
-            'sessionID' => '2',
-            'username' => 'manish',
-            'password' => 'pass',
-            'refNo' => '502000098',
-            'signature'=> 'fasdfsadf');
-    
-    $this->model = new MLhuillier($postParam);
+    $output = $user->changePassword('40162', '123456', 'manish') ;
 
-    // $expected= array('sessionID' => 2, 'status'=> 1);
-
+    if($output==true)
+    {
+      $check = $user->authenticateUser('40162', '123456');
+    }
     
-    // $this->model->showRemittanceDetail();
-    // $result = $this->model->getReturn();
-var_dump($this->model->connection);
-    $this->assertEquals($expected =1, $result =1);
-    
+    $this->assertFalse($check);
   }
 
 }

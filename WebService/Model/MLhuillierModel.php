@@ -15,6 +15,8 @@ namespace Model;
 
 use Model\TransactionModel as Transaction;
 use Model\WebServiceModel as WebService;
+use Model\UserModel as User;
+
 
 /**
  * Bridge to call TB DBAL
@@ -133,7 +135,11 @@ class MLhuillierModel extends WebService
      */
     public function getUnAuthorizedData()
     {
-          $this->return  = $this->parameters['sessionID'] .'|5';
+        if ($this->parameters['operation']=='changePassword') {
+            $this->return =$this->parameters['sessionID'] .'|1';            
+        } else {
+            $this->return =$this->parameters['sessionID'] .'|5';
+        }
     }
 
     /**
@@ -158,6 +164,26 @@ class MLhuillierModel extends WebService
                 $this->return['middleName'].'|'.$this->return['street'].'|zero';
         }
          
+    }
+
+    /**
+     * [changePassword description]
+     * 
+     * @return [type] [description]
+     */
+    public  function changePassword() 
+    {
+        if ($this->parameters['newPassword'] !=' ') {
+            $user = new User();
+            $status=$user->changePassword($this->parameters['username'], $this->parameters['newPassword']); 
+            if ($status == true) {
+                $this ->return =$this->parameters['sessionID'].'|0';
+            } else {
+                $this->return = 'error in changing password';
+            }         
+
+        }
+
     }
 
     /**
